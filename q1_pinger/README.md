@@ -21,6 +21,22 @@ source install/setup.bash
 ros2 launch auv_sim pinger.launch.py seed:=<your_roll_number>
 ```
 
+## Seeing what your controller did
+
+There is no live GUI, but you can record a run and plot it:
+
+```bash
+ros2 launch auv_sim pinger.launch.py seed:=1234 trace_file:=run.csv
+python3 plot_run.py run.csv          # writes run.png
+```
+
+That draws your path, where each bearing fix arrived, and your distance to the
+pinger over time. The pinger's true position is written to the trace **only
+when the episode ends**, so it cannot help you mid-run — but afterwards it
+usually makes the problem obvious in one glance.
+
+Do this with the starter controller before you write anything.
+
 ## What you're given
 
 | topic | type | rate | contents |

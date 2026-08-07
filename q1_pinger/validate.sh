@@ -11,7 +11,10 @@
 # your submission. If any check fails, we cannot, and you will score zero on a
 # question you may well have solved.
 
-set -uo pipefail
+# NOT -u: ROS's own setup.bash references unset variables
+# (AMENT_TRACE_SETUP_FILES), so `set -u` makes sourcing it fatal and every
+# submission fails the build check for a reason that is not the candidate's.
+set -o pipefail
 
 SEED="${1:-0}"
 WS="$(cd "$(dirname "$0")" && pwd)/ros2_ws"

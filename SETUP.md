@@ -53,6 +53,9 @@ commit history there is how we see how you worked.
    git clone https://github.com/<your-username>/auv-recruitment-2026.git
    cd auv-recruitment-2026
    ```
+
+   It is **about 330 MB** — most of that is the Q3 training images. On a slow
+   connection this takes a while; it is not stuck.
 3. Commit as you go. A single "final commit" at the deadline tells us nothing;
    twenty small commits tell us how you attacked the problem.
 
