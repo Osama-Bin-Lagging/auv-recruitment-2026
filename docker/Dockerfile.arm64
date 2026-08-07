@@ -1,0 +1,66 @@
+# ROS 2 Humble + Ignition Fortress for arm64 (Apple Silicon), with a
+# browser-based GUI.
+#
+# Why this exists: ros-humble-ros-gz-sim has no arm64 jammy binary, so we build
+# ros_gz from source. Fortress itself IS packaged for arm64, so only the ROS
+# bridge layer needs compiling.
+#
+# GUI over noVNC rather than X11 forwarding: XQuartz on macOS is slow and
+# fiddly to set up, and a browser tab works identically on Mac, Windows and
+# Linux. Candidates open http://localhost:6080 and see Gazebo.
+FROM ros:humble-ros-base
+
+SHELL ["/bin/bash", "-c"]
+ARG DEBIAN_FRONTEND=noninteractive
+
+# --- Fortress from the OSRF repo, plus the dev headers ros_gz compiles against
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      wget gnupg ca-certificates git \
+    && wget -qO /usr/share/keyrings/pkgs-osrf-archive-keyring.gpg \
+         https://packages.osrfoundation.org/gazebo.gpg \
+    && echo "deb [arch=arm64 signed-by=/usr/share/keyrings/pkgs-osrf-archive-keyring.gpg] \
+http://packages.osrfoundation.org/gazebo/ubuntu-stable jammy main" \
+         > /etc/apt/sources.list.d/gazebo-stable.list \
+    && apt-get update && apt-get install -y --no-install-recommends \
+      ignition-fortress \
+      libignition-gazebo6-dev \
+      libignition-transport11-dev \
+      libignition-msgs8-dev \
+      libignition-sensors6-dev \
+      libignition-rendering6-dev \
+      libignition-math6-dev \
+      libignition-common4-dev \
+      libignition-plugin-dev \
+      libignition-fuel-tools7-dev \
+      ros-humble-xacro \
+      python3-pip python3-colcon-common-extensions \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- Headless X + noVNC so the Gazebo GUI is reachable from a browser
+RUN apt-get update && apt-get install -y --no-install-recommends \
+      xvfb x11vnc novnc websockify supervisor \
+      libgl1-mesa-dri mesa-utils \
+    && rm -rf /var/lib/apt/lists/*
+
+# --- ros_gz from source (the arm64 gap)
+ENV GZ_VERSION=fortress \
+    IGNITION_VERSION=fortress
+RUN mkdir -p /ws/src && cd /ws/src \
+    && git clone https://github.com/gazebosim/ros_gz.git -b humble --depth 1 \
+    && cd /ws \
+    && apt-get update \
+    && rosdep install -r -y -i --from-paths src --rosdistro humble \
+         --skip-keys="ignition-gazebo6 ignition-msgs8 ignition-transport11 ignition-sensors6 ignition-rendering6 ignition-math6 ignition-common4 ignition-fuel-tools7" \
+    && source /opt/ros/humble/setup.bash \
+    && MAKEFLAGS=-j1 colcon build --merge-install \
+         --executor sequential --parallel-workers 1 \
+         --cmake-args -DCMAKE_BUILD_TYPE=Release \
+    && rm -rf /var/lib/apt/lists/* /ws/build /ws/log
+
+ENV IGN_GAZEBO_RESOURCE_PATH=/work/models \
+    LIBGL_ALWAYS_SOFTWARE=1 \
+    DISPLAY=:1
+RUN echo 'source /opt/ros/humble/setup.bash; source /ws/install/setup.bash' >> /root/.bashrc
+
+WORKDIR /work
+EXPOSE 6080

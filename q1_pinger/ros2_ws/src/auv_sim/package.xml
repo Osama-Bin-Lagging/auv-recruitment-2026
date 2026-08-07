@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="3">
+  <name>auv_sim</name>
+  <version>1.0.0</version>
+  <description>
+    Pinger-homing simulator exposed over ROS 2. Provided complete -- you do not
+    need to modify it. Grading runs this same node with private seeds.
+  </description>
+  <maintainer email="auv@iitb.ac.in">AUV-IITB</maintainer>
+  <license>MIT</license>
+  <depend>rclpy</depend>
+  <depend>auv_interfaces</depend>
+  <exec_depend>python3-numpy</exec_depend>
+  <export><build_type>ament_python</build_type></export>
+</package>

@@ -1,0 +1,20 @@
+# ---- NEVER COMMIT: grading material ----
+# private test set, reference solutions, grading plan
+grader/
+
+# Q3 training data is committed directly (q3_detection/release/).
+# Only the held-back test split stays out.
+q3_detection/private/
+
+# ---- generated per-seed worlds ----
+q2_gazebo/course_*.sdf
+q2_gazebo/course_*_gates.yaml
+
+# ---- build artifacts ----
+**/build/
+**/install/
+**/log/
+__pycache__/
+*.pyc
+.DS_Store
+.omc/
