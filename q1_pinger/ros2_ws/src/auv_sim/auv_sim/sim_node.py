@@ -56,6 +56,9 @@ class SimNode(Node):
         self.declare_parameter("seed", 0)
         self.declare_parameter("mode", "realtime")
         self.declare_parameter("command_timeout", 0.5)
+        # Optional CSV trace. Off by default; set trace_file:=run.csv to record
+        # a run and then plot it with plot_run.py.
+        self.declare_parameter("trace_file", "")
 
         self.seed = int(self.get_parameter("seed").value)
         self.mode = str(self.get_parameter("mode").value)
@@ -73,6 +76,11 @@ class SimNode(Node):
         self._cmd_event = threading.Event()
         self.missed_deadlines = 0
         self._tick = 0
+
+        path = str(self.get_parameter("trace_file").value)
+        self._trace = open(path, "w") if path else None
+        if self._trace:
+            self._trace.write("t,x,y,heading,valid,bearing,hold_time\n")
 
         self.get_logger().info(
             f"sim ready: seed={self.seed} mode={self.mode} "
@@ -120,6 +128,12 @@ class SimNode(Node):
             ep.elapsed = obs.t
             self.pub_ep.publish(ep)
 
+        if self._trace:
+            b = obs.bearing
+            self._trace.write(
+                f"{obs.t:.3f},{obs.x:.4f},{obs.y:.4f},{obs.heading:.4f},"
+                f"{int(b is not None)},{b if b is not None else 0.0:.5f},"
+                f"{obs.hold_time:.3f}\n")
         return obs
 
     def _await_command(self, step: int):
@@ -159,6 +173,13 @@ class SimNode(Node):
                 sleep = next_wall - self.get_clock().now().nanoseconds / 1e9
                 if sleep > 0:
                     self.get_clock().sleep_for(rclpy.duration.Duration(seconds=sleep))
+        if self._trace:
+            # The pinger position is revealed only now that the episode is over,
+            # so the trace can never be used to cheat mid-run.
+            self._trace.write(f"# pinger {self.sim.pinger[0]:.4f} {self.sim.pinger[1]:.4f}\n")
+            self._trace.write(f"# capture_radius {CAPTURE_RADIUS}\n")
+            self._trace.close()
+            self._trace = None
         return self.sim.result()
 
 
