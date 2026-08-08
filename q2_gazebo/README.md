@@ -96,12 +96,28 @@ GUI only when you need to look at something.
 
 ---
 
-## Optional: do it without the map
+## Bonus, purely if you feel like exploring
 
-Ignore the obstacle and gate positions and find the gates using the **camera**
-instead — regenerate with `--with-camera` and the posts are red and blue against
-blue-green water. Attempt this only if Parts A and B work. It is not scored;
-it tells us you might belong in the vision subsystem.
+Not part of the assignment. Not scored. Do not attempt it unless Parts A and B
+are finished and you are curious.
+
+The vehicle can carry a forward camera:
+
+```bash
+python3 generate_world.py --seed <your_roll_number> --with-camera --out course.sdf
+```
+
+That adds `/auv/camera` and the posts are red and blue against blue-green water,
+so in principle you could find the gates yourself instead of reading their
+positions from the map file.
+
+Two honest warnings. The camera forces Gazebo to render, which is noticeably
+slower on a machine without a GPU — that is why it is off by default. And we
+have not tried solving the course this way ourselves, so we do not know how hard
+it is. Treat it as a sandbox, not a challenge with a known answer.
+
+If underwater vision is the part you find interesting, **Q3 is the real version
+of this** — same problem, real footage from our pool, and it is actually scored.
 
 ---
 
