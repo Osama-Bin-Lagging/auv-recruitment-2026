@@ -34,7 +34,7 @@ Linux users can skip this — Docker uses the host's memory directly.
 ## 3. Pull the image
 
 ```bash
-docker pull ghcr.io/<org>/auv-recruitment:2026
+docker pull ghcr.io/osama-bin-lagging/auv-recruitment:2026
 ```
 
 About 4 GB. It contains ROS 2 Humble, Gazebo Fortress, and the ROS–Gazebo
@@ -65,7 +65,7 @@ collaborators if you would rather it stayed private.
 If we push a fix or clarification during the week, pull it in:
 
 ```bash
-git remote add upstream https://github.com/<org>/auv-recruitment-2026.git
+git remote add upstream https://github.com/Osama-Bin-Lagging/auv-recruitment-2026.git
 git pull upstream main
 ```
 
@@ -75,7 +75,7 @@ git pull upstream main
 docker run -it --rm \
   -p 6080:6080 \
   -v "$PWD":/work \
-  ghcr.io/<org>/auv-recruitment:2026
+  ghcr.io/osama-bin-lagging/auv-recruitment:2026
 ```
 
 `-v "$PWD":/work` mounts this folder inside the container, so **edit files in
