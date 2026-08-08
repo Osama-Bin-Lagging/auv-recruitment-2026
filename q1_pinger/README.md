@@ -1,16 +1,11 @@
 # Q1 — Find the Pinger
 
-**ROS 2 · ~5 hours · Days 1–4**
+Somewhere in the pool there's an acoustic pinger. Your vehicle has to find it and
+park on top of it. You can't see it, and you have no sonar map. All you have is a
+hydrophone.
 
-## Background
-
-Every AUV competition has an acoustic task: somewhere in the pool there is a
-pinger, and your vehicle has to find it and park over it. You cannot see it —
-the water is murky and it is too far away. All you have is a hydrophone.
-
-A hydrophone tells you a **direction**. It does not tell you a **distance**.
-That distinction is the whole of this problem, and it is worth sitting with
-before you write any code.
+A hydrophone gives you a direction. It never gives you a distance. Sit with that
+before you write anything.
 
 ## Running it
 
@@ -21,101 +16,97 @@ source install/setup.bash
 ros2 launch auv_sim pinger.launch.py seed:=<your_roll_number>
 ```
 
-## Seeing what your controller did
+## Seeing what happened
 
-There is no live GUI, but you can record a run and plot it:
+There's no live view, but you can record a run and plot it:
 
 ```bash
 ros2 launch auv_sim pinger.launch.py seed:=1234 trace_file:=run.csv
-python3 plot_run.py run.csv          # writes run.png
+python3 plot_run.py run.csv
 ```
 
-That draws your path, where each bearing fix arrived, and your distance to the
-pinger over time. The pinger's true position is written to the trace **only
-when the episode ends**, so it cannot help you mid-run — but afterwards it
-usually makes the problem obvious in one glance.
+You get your path, the points where a bearing fix arrived, and your distance to
+the pinger over time. The pinger's real position goes into the trace only after
+the episode ends, so it can't help you mid-run.
 
-Do this with the starter controller before you write anything.
+Do this with the starter controller first.
 
-## What you're given
+## What you get
 
 | topic | type | rate | contents |
 |---|---|---|---|
-| `/auv/state` | `VehicleState` | 60 Hz | your own position, velocity, heading |
-| `/auv/hydrophone` | `HydrophoneFix` | 60 Hz | `valid` + `bearing` — see below |
-| `/auv/episode` | `EpisodeStatus` | 5 Hz | how long you have held station so far |
+| `/auv/state` | `VehicleState` | 60 Hz | your position, velocity, heading |
+| `/auv/hydrophone` | `HydrophoneFix` | 60 Hz | `valid` + `bearing` |
+| `/auv/episode` | `EpisodeStatus` | 5 Hz | how long you've held station |
 
-**About the hydrophone.** `bearing` is the direction to the pinger *relative to
-your heading*, in radians. There is no range field and there will not be one.
+`bearing` is the direction to the pinger relative to your heading, in radians.
+There is no range field.
 
-`valid` is true only about once every 2 seconds, and not reliably even then:
+`valid` is true roughly once every 2 seconds, and not reliably:
 
-- **3–9° of noise** on every fix (how much depends on your seed)
-- **5–20% of pings are lost**
-- the pinger **goes silent for 8–15 seconds** at some point
+- 3–9° of noise on every fix, depending on your seed
+- 5–20% of pings never arrive
+- the pinger goes quiet for 8–15 seconds at some point
 
-You cannot tell these apart. `valid == false` means "no fix right now" and
-nothing more — real hardware cannot distinguish them either.
+You can't tell these apart. `valid == false` means "nothing right now". Real
+hydrophones can't distinguish them either.
 
 ## Your vehicle
 
-Holonomic in the horizontal plane, like a vectored-thruster AUV: it moves
-sideways without turning. You publish `VelocityCommand` on `/auv/cmd` with a
-**world-frame velocity** and a desired heading; both arrive through a
-first-order lag, because thrusters are not instant. Top speed 1.5 m/s.
+Holonomic in the horizontal plane, like a vectored-thruster AUV. It strafes
+without turning. You publish `VelocityCommand` on `/auv/cmd` with a world-frame
+velocity and a desired heading. Both arrive through a first-order lag because
+thrusters aren't instant. Top speed 1.5 m/s.
 
-Heading only points the hydrophone. It does not steer you.
+Heading aims the hydrophone. It doesn't steer you.
 
 ## The task
 
-> **Get within 1.0 m of the pinger and stay there for 5 continuous seconds.**
+Get within 1.0 m of the pinger and stay there for 5 continuous seconds.
 
-Leaving the capture radius resets the hold timer to zero. Orbiting the pinger is
-not holding station over it. You have 200 seconds.
+Leaving the radius resets the timer. Orbiting isn't holding. You have 200
+seconds.
 
 ## Your seed
 
-Your arena comes from **your roll number** — pinger position, noise level,
-dropout rate and silent window all differ per candidate. Gains that work for
-your friend will not work for you. Grading uses seeds you have never run.
+Your arena comes from your roll number. Pinger position, noise, dropout rate and
+the quiet window all differ between candidates, so gains that work for someone
+else won't work for you. Grading uses seeds nobody has run.
 
 ## Timing modes
 
-The simulator runs in `realtime` (default) or `lockstep`.
+`realtime` is the default. The sim steps on a wall clock and uses your most
+recent command, so a slow controller means stale commands, like a real robot.
 
-- **realtime** — steps on a wall clock using the most recent command. If your
-  controller is slow, commands go stale, exactly like a real robot.
-- **lockstep** — publishes state, then waits for a command tagged with the
-  matching step before advancing. **Grading uses this**, so your score never
-  depends on how loaded the grading machine was.
+`lockstep` is what grading uses. The sim publishes state and waits for a command
+tagged with the matching step before advancing, so your score doesn't depend on
+how busy the grading machine was.
 
-Set `header.frame_id` to the `step` of the `VehicleState` you are answering and
-your controller works unchanged in both. If it does not match, that step coasts
-and is counted against you. Try `mode:=lockstep` before submitting.
+Set `header.frame_id` to the `step` of the `VehicleState` you're answering and
+your controller works in both. If it doesn't match, that step coasts and counts
+against you. Try `mode:=lockstep` before you submit.
 
-## What to submit
+## Submitting
 
 Your `controller_node`, plus:
 
-- **Tuning as ROS parameters**, not constants buried in the source
-- A **launch file** bringing up simulator and controller together
-- **`REPORT.md`, one page maximum** — your approach, and one paragraph on what
-  you tried that did not work and how you worked out why
+- tuning as ROS parameters, not constants in the source
+- a launch file that brings up sim and controller together
+- `REPORT.md`, one page: your approach, and a paragraph on something that didn't
+  work and how you figured out why
 
-Run `./validate.sh <your_roll_number>` before submitting. It does not tell you
-your score; it tells you whether we can grade you at all.
+Run `./validate.sh <your_roll_number>` first. It won't tell you your score, only
+whether we can run your code at all.
 
-## How it's graded
+## Grading
 
-Your controller runs against **N private seeds**. Your score is the fraction on
-which you hold station. Top scorers are invited to a short interview to talk
-through their approach.
+Your controller runs against private seeds. Your score is the fraction where you
+hold station. Top scorers get a short interview about their approach.
 
-## One deliberate warning
+## One warning
 
-The starter controller drives at the last known bearing at full speed. It will
-reach the pinger on essentially every seed, and hold station on none of them.
+The starter controller drives at the last known bearing, full speed. It reaches
+the pinger on nearly every seed and holds station on none of them.
 
-**Run it first.** Watch what happens when it arrives. Understanding exactly why
-it fails is most of this problem, and it is not something you can reason out
-from this document.
+Run it. Watch what happens when it arrives. Working out why is most of the
+problem, and you won't get there by reading this page.

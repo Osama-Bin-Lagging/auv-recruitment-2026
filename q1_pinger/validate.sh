@@ -1,19 +1,9 @@
 #!/usr/bin/env bash
-# Run this BEFORE you submit.
-#
-# It checks the things that would otherwise make your submission ungradeable --
-# missing files, a modified message contract, a workspace that does not build,
-# a controller that never publishes. It does NOT tell you your score.
-#
+# Checks that we can actually run your submission. Not a score.
 #   ./validate.sh <your_roll_number>
-#
-# Run it inside the provided Docker image. If every check says OK, we can grade
-# your submission. If any check fails, we cannot, and you will score zero on a
-# question you may well have solved.
+# Run it inside the provided image. If anything fails we cannot grade you.
 
-# NOT -u: ROS's own setup.bash references unset variables
-# (AMENT_TRACE_SETUP_FILES), so `set -u` makes sourcing it fatal and every
-# submission fails the build check for a reason that is not the candidate's.
+# No -u: ROS's setup.bash reads unset vars, which would abort the script.
 set -o pipefail
 
 SEED="${1:-0}"
@@ -38,9 +28,7 @@ for f in \
                || bad "missing: $f"
 done
 
-# --- 2. the message contract is fixed ------------------------------------
-# Both your nodes and our grading simulator are built against these exact
-# definitions. If you change them, your controller cannot talk to our sim.
+# --- 2. message contract -------------------------------------------------
 echo
 echo "[2/4] message contract unmodified"
 EXPECTED="EpisodeStatus.msg HydrophoneFix.msg VehicleState.msg VelocityCommand.msg"

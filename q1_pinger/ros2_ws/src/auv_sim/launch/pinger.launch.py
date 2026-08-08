@@ -1,10 +1,6 @@
-"""Bring up the simulator and your controller together.
-
-    ros2 launch auv_sim pinger.launch.py seed:=<your_roll_number>
-
-Add mode:=lockstep to run the way grading does.
-Add trace_file:=run.csv to record a run, then plot it with plot_run.py.
-"""
+# ros2 launch auv_sim pinger.launch.py seed:=<roll_number>
+#   mode:=lockstep        run the way grading does
+#   trace_file:=run.csv   record a run for plot_run.py
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument

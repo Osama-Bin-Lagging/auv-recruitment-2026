@@ -1,10 +1,10 @@
-# Vehicle proprioception, published on /auv/state at 60 Hz.
-# All of this is known to the vehicle itself. None of it locates the pinger.
+# Vehicle proprioception, world frame, metres and m/s.
+# None of this locates the pinger.
 std_msgs/Header header
-float32 x                 # metres, world frame
-float32 y                 # metres, world frame
-float32 vx                # m/s, world frame
-float32 vy                # m/s, world frame
-float32 heading           # radians
-float32 sim_time          # seconds since episode start
+float32 x
+float32 y
+float32 vx
+float32 vy
+float32 heading
+float32 sim_time
 uint32  step

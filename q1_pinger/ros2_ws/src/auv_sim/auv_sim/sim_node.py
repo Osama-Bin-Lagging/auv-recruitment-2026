@@ -1,26 +1,3 @@
-"""Simulator node. Provided complete -- you do not need to modify this.
-
-Wraps pinger_sim.py and exposes it over ROS 2:
-
-    publishes   /auv/state       VehicleState     60 Hz
-                /auv/hydrophone  HydrophoneFix    60 Hz (mostly invalid)
-                /auv/episode     EpisodeStatus     5 Hz
-    subscribes  /auv/cmd         VelocityCommand
-
-Two timing modes, selected by the `mode` parameter:
-
-  realtime  (default, what you develop against)
-      Steps on a wall-clock timer using the most recent command received. If
-      your controller is slow, commands go stale -- exactly like a real robot.
-
-  lockstep  (what grading uses)
-      Publishes state, then waits for a command whose header.frame_id matches
-      the step number before advancing. This makes an episode a pure function
-      of (seed, controller), so your score does not depend on how busy the
-      grading machine was. Set header.frame_id to the step you are answering
-      and your controller works unchanged in both modes.
-"""
-
 from __future__ import annotations
 
 import threading
@@ -33,15 +10,12 @@ from rclpy.qos import QoSHistoryPolicy, QoSProfile, QoSReliabilityPolicy
 from auv_interfaces.msg import EpisodeStatus, HydrophoneFix, VehicleState, VelocityCommand
 from auv_sim.pinger_sim import CAPTURE_RADIUS, DT, HOLD_REQUIRED, PingerSim
 
-# Sensor data: best-effort, depth 1. A stale bearing is worse than no bearing,
-# so we never want the middleware replaying old fixes.
+# Depth 1 best-effort: a stale bearing is worse than no bearing.
 SENSOR_QOS = QoSProfile(
     reliability=QoSReliabilityPolicy.BEST_EFFORT,
     history=QoSHistoryPolicy.KEEP_LAST,
     depth=1,
 )
-# Commands: reliable. A silently dropped command is indistinguishable from a
-# controller bug, which makes debugging miserable.
 COMMAND_QOS = QoSProfile(
     reliability=QoSReliabilityPolicy.RELIABLE,
     history=QoSHistoryPolicy.KEEP_LAST,
@@ -56,8 +30,6 @@ class SimNode(Node):
         self.declare_parameter("seed", 0)
         self.declare_parameter("mode", "realtime")
         self.declare_parameter("command_timeout", 0.5)
-        # Optional CSV trace. Off by default; set trace_file:=run.csv to record
-        # a run and then plot it with plot_run.py.
         self.declare_parameter("trace_file", "")
 
         self.seed = int(self.get_parameter("seed").value)
@@ -118,7 +90,7 @@ class SimNode(Node):
         self.pub_fix.publish(fx)
 
         self._tick += 1
-        if self._tick % 12 == 0:  # ~5 Hz
+        if self._tick % 12 == 0:
             ep = EpisodeStatus()
             ep.header.stamp = now
             ep.active = not self.sim.done
@@ -144,38 +116,29 @@ class SimNode(Node):
             self._cmd_event.clear()
             if self._cmd_step == step:
                 return self._cmd
-        # No answer in time: coast. Counted and reported -- keeping up matters.
         self.missed_deadlines += 1
         return (0.0, 0.0, 0.0)
 
     def run(self):
-        """Run the episode to completion and return the result.
-
-        Wrapped in a context guard: in realtime mode an episode lasts up to
-        200 s of wall clock, so Ctrl-C mid-run is the normal way candidates
-        will stop it. Without this, shutdown races the publish loop and dumps
-        an RCLError traceback over a perfectly healthy run.
-        """
         next_wall = self.get_clock().now().nanoseconds / 1e9
         while not self.sim.done and rclpy.ok():
             try:
                 obs = self._publish()
             except Exception:
                 if not rclpy.ok():
-                    break          # shutting down; not an error
+                    break
                 raise
             vx, vy, heading = self._await_command(obs.step)
             self.sim.step(vx, vy, heading)
 
             if self.mode != "lockstep":
-                # Pace to wall clock so the GUI/logs look like real time.
                 next_wall += DT
                 sleep = next_wall - self.get_clock().now().nanoseconds / 1e9
                 if sleep > 0:
                     self.get_clock().sleep_for(rclpy.duration.Duration(seconds=sleep))
+
         if self._trace:
-            # The pinger position is revealed only now that the episode is over,
-            # so the trace can never be used to cheat mid-run.
+            # Pinger position lands in the trace only now the episode is over.
             self._trace.write(f"# pinger {self.sim.pinger[0]:.4f} {self.sim.pinger[1]:.4f}\n")
             self._trace.write(f"# capture_radius {CAPTURE_RADIUS}\n")
             self._trace.close()
@@ -186,10 +149,8 @@ class SimNode(Node):
 def main():
     rclpy.init()
     node = SimNode()
-    # An explicit executor rather than rclpy.spin in a daemon thread: the
-    # daemon thread is still inside spin() when the process exits, which
-    # aborts (SIGABRT) after a perfectly good episode. We need to be able to
-    # stop it deterministically before tearing the node down.
+    # Explicit executor rather than spin() in a daemon thread, so it can be
+    # stopped before teardown instead of aborting at process exit.
     executor = rclpy.executors.SingleThreadedExecutor()
     executor.add_node(node)
     spin = threading.Thread(target=executor.spin, daemon=True)
@@ -204,7 +165,6 @@ def main():
             f"episode over: success={r.success} reached={r.reached} "
             f"t={r.time_to_success} rms={r.station_rms} missed={node.missed_deadlines}"
         )
-        # Machine-readable line for the grader.
         print(f"RESULT seed={r.seed} success={r.success} reached={r.reached} "
               f"t_success={r.time_to_success} station_rms={r.station_rms} "
               f"path={r.path_length:.1f} fixes={r.n_fixes} "

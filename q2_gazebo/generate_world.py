@@ -1,23 +1,7 @@
 #!/usr/bin/env python3
-"""Generate a seeded Gazebo Fortress world for Q2: gate traversal.
-
-Each candidate gets a different course from their roll-number seed; grading uses
-private seeds from a disjoint range. The course is emitted as a single
-self-contained .sdf so there are no model-path or Fuel-download problems --
-those eat hours of a beginner's week and test nothing.
-
-Deliberate simplifications, because this question is about *software*:
-  * zero gravity + a velocity-controlled vehicle. A neutrally buoyant AUV under
-    closed-loop velocity control behaves like this, and it keeps the question
-    about ROS<->Gazebo integration, frames, perception and mission logic rather
-    than hydrodynamic tuning (which Q1's sibling question already covers).
-  * gate posts are coloured red/blue to match the real gate_symbols imagery, so
-    the perception approach here transfers to the optional ML question.
-
-Usage:
-    python3 generate_world.py --seed 42 --out course_42.sdf
-    python3 generate_world.py --seed 42 --answer     # print gate ground truth
-"""
+# Generates a seeded Gazebo Fortress course as one self-contained .sdf.
+#   python3 generate_world.py --seed 42 --out course_42.sdf
+#   python3 generate_world.py --seed 42 --answer     # gate ground truth
 
 from __future__ import annotations
 
@@ -51,11 +35,6 @@ POST_R = 0.08
 
 
 def gate_sdf(idx: int, x: float, y: float, z: float, yaw: float) -> str:
-    """One gate: two vertical posts (red left, blue right) and a crossbar.
-
-    Static models -- collisions are detected by the grader from vehicle pose vs
-    gate geometry, so the posts need no physics of their own.
-    """
     half = GATE_WIDTH / 2.0
     parts = []
     for side, colour, rgba in (
@@ -114,16 +93,7 @@ def obstacle_sdf(idx: int, x: float, y: float, z: float, r: float) -> str:
 
 def vehicle_sdf(start_x: float, start_y: float, start_z: float, start_yaw: float,
                 with_camera: bool = False) -> str:
-    """A simple box AUV with a forward camera, an IMU, and velocity control.
-
-    VelocityControl accepts a twist on /model/auv/cmd_vel (Gazebo Transport);
-    bridging that to ROS 2 is part of the candidate's job. OdometryPublisher
-    gives them a pose to work from -- this question is not about SLAM.
-    """
-    # The camera forces the Sensors system and an ogre2 render engine, which
-    # is GPU-bound and crawls under software rasterisation -- i.e. exactly the
-    # headless/emulated case. Off by default so nobody pays for a sensor they
-    # were never asked to use.
+    # Camera is opt-in: it forces rendering, which is slow without a GPU.
     camera_block = CAMERA_SDF if with_camera else ""
     return f"""
     <model name="auv">
@@ -161,15 +131,13 @@ def vehicle_sdf(start_x: float, start_y: float, start_z: float, start_yaw: float
         <odom_frame>world</odom_frame>
         <robot_base_frame>auv</robot_base_frame>
         <odom_publish_frequency>30</odom_publish_frequency>
-        <!-- Without this OdometryPublisher reports 2D only and z is always
-             0.0, which is silently wrong for an underwater vehicle. -->
+          <!-- 2D by default, which silently reports z as 0.0 -->
         <dimensions>3</dimensions>
       </plugin>
     </model>"""
 
 
 def build_course(seed: int):
-    """Lay out gates down the pool with randomised lateral offset and heading."""
     rng = random.Random(seed)
     n_gates = rng.choice([3, 4, 4, 5])
 
@@ -179,19 +147,14 @@ def build_course(seed: int):
     y = -POOL_L / 2 + 10.0
     for i in range(n_gates):
         x = rng.uniform(-POOL_W / 4, POOL_W / 4)
-        # Gates sit near the vehicle's start depth (-4 m), with only mild
-        # variation. Depth changes are a distraction here -- Part B is about
-        # bridging and waypoint following, not 3D trajectory planning.
+        # Near the start depth: this question is not 3D trajectory planning.
         z = rng.uniform(-5.0, -3.5)
         yaw = rng.uniform(-0.5, 0.5)
         gates.append((x, y, z, yaw))
         y += rng.uniform(9.0, 14.0)
 
-    # Obstacles are placed ON the straight line between consecutive gates,
-    # offset slightly. Previously they were scattered uniformly, which meant
-    # some candidates got a clear run and others got one parked on a gate
-    # approach -- identical work, different scores. Now every seed presents
-    # the same challenge: a pure waypoint-follower will hit something.
+    # On the line between consecutive gates, so every seed blocks a naive
+    # straight-line follower rather than only some seeds doing so.
     obstacles = []
     legs = [(start_xy, gates[0][:2])] if gates else []
     legs += [(gates[i][:2], gates[i + 1][:2]) for i in range(len(gates) - 1)]
@@ -199,15 +162,10 @@ def build_course(seed: int):
         t = rng.uniform(0.35, 0.65)                 # partway along the leg
         cx = a[0] + (b[0] - a[0]) * t
         cy = a[1] + (b[1] - a[1]) * t
-        # Offset perpendicular to the leg by less than the vehicle's clearance,
-        # so it genuinely blocks rather than merely decorating.
         dx, dy = b[0] - a[0], b[1] - a[1]
         n = math.hypot(dx, dy) or 1.0
         px, py = -dy / n, dx / n
-        # Retry until the obstacle is clear of every gate. Blocking the LINE
-        # between gates is the point; blocking a gate itself is unfair, because
-        # no amount of skill gets you through a 2 m gate with a 1 m sphere in
-        # it. Keep a 2-gate-width standoff.
+        # Keep clear of the gates themselves; a blocked gate is unfair.
         for _attempt in range(24):
             off = rng.uniform(-1.2, 1.2)
             r = rng.uniform(0.6, 1.1)
@@ -302,9 +260,7 @@ def main():
         f.write(world)
     print(f"wrote {out} ({len(world)} bytes)")
 
-    # Gate waypoints, in the order they must be passed. Emitted as plain YAML
-    # rather than published on a topic: it is static data, and loading it is a
-    # one-liner in whatever node the candidate is already writing.
+    # Static data, so a file rather than a topic.
     gates, obstacles, start = build_course(args.seed)
     gpath = out.rsplit(".", 1)[0] + "_gates.yaml"
     with open(gpath, "w") as f:
@@ -314,9 +270,6 @@ def main():
         f.write("gates:\n")
         for i, (x, y, z, yaw) in enumerate(gates):
             f.write(f"  - {{id: {i}, x: {x:.3f}, y: {y:.3f}, z: {z:.3f}, yaw: {yaw:.4f}}}\n")
-        # Obstacles are given too. This is a PLANNING problem, not a perception
-        # one -- you know the map, the question is what path you take through
-        # it. Finding obstacles yourself is the optional camera part.
         f.write("# Spherical obstacles. Vehicle half-diagonal is ~0.5 m,\n")
         f.write("# so keep your path at least (radius + 0.5) m from each centre.\n")
         f.write("obstacles:\n")

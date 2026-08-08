@@ -3,8 +3,8 @@
   <name>auv_controller</name>
   <version>1.0.0</version>
   <description>
-    Your controller. This package is yours to change however you like -- the
-    only fixed part is the topic and message contract in auv_interfaces.
+    Your controller. Change whatever you like here; only the topic and
+    message contract is fixed.
   </description>
   <maintainer email="auv@iitb.ac.in">AUV-IITB</maintainer>
   <license>MIT</license>

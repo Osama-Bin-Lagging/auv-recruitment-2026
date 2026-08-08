@@ -4,10 +4,8 @@
   <name>auv_interfaces</name>
   <version>1.0.0</version>
   <description>
-    Message contract for the AUV-IITB recruitment pinger-homing task.
-    This package is provided complete and MUST NOT be modified: both the
-    reference simulator and the reference controller are built against these
-    exact definitions, and grading swaps your nodes against them.
+    Message contract for the pinger task. Do not modify: grading is built
+    against these exact definitions.
   </description>
   <maintainer email="auv@iitb.ac.in">AUV-IITB</maintainer>
   <license>MIT</license>
