@@ -21,8 +21,9 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE: ${{ github.repository_owner }}/auv-recruitment
   TAG: 2026
+  # IMAGE is computed per job: Docker refs must be lowercase, and
+  # github.repository_owner preserves the account's original casing.
 
 jobs:
   build:
@@ -42,6 +43,11 @@ jobs:
             arch: arm64
     steps:
       - uses: actions/checkout@v4
+
+      - name: Compute lowercase image name
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: echo "IMAGE=$(echo "$OWNER/auv-recruitment" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -86,6 +92,11 @@ jobs:
           path: /tmp/digests
           pattern: digest-*
           merge-multiple: true
+
+      - name: Compute lowercase image name
+        env:
+          OWNER: ${{ github.repository_owner }}
+        run: echo "IMAGE=$(echo "$OWNER/auv-recruitment" | tr '[:upper:]' '[:lower:]')" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@v3
 
