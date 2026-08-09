@@ -1,7 +1,7 @@
-# Q1 — Find the Pinger
+# Q1: Find the Pinger
 
 Somewhere in the pool there's an acoustic pinger. Your vehicle has to find it and
-park on top of it. You can't see it, and you have no sonar map. All you have is a
+park on top of it. You can't see it and you have no map. All you have is a
 hydrophone.
 
 A hydrophone gives you a direction. It never gives you a distance. Sit with that
@@ -44,9 +44,9 @@ There is no range field.
 
 `valid` is true roughly once every 2 seconds, and not reliably:
 
-- 3–9° of noise on every fix, depending on your seed
-- 5–20% of pings never arrive
-- the pinger goes quiet for 8–15 seconds at some point
+- 3 to 9 degrees of noise on every fix, depending on your seed
+- 5 to 20 percent of pings never arrive
+- the pinger goes quiet for 8 to 15 seconds at some point
 
 You can't tell these apart. `valid == false` means "nothing right now". Real
 hydrophones can't distinguish them either.
@@ -55,7 +55,7 @@ hydrophones can't distinguish them either.
 
 Holonomic in the horizontal plane, like a vectored-thruster AUV. It strafes
 without turning. You publish `VelocityCommand` on `/auv/cmd` with a world-frame
-velocity and a desired heading. Both arrive through a first-order lag because
+velocity and a desired heading. Both arrive through a first-order lag, because
 thrusters aren't instant. Top speed 1.5 m/s.
 
 Heading aims the hydrophone. It doesn't steer you.

@@ -7,12 +7,14 @@ Budget about 45 minutes, mostly downloading.
 
 ## 1. Docker
 
-- **Windows** — Docker Desktop with the WSL 2 backend. The installer offers it;
-  accept.
-- **macOS** — Docker Desktop. Works on Intel and Apple Silicon, and you don't
-  need to know which you have.
-- **Linux** — Docker Engine from your distro, plus your user in the `docker`
-  group so you don't need `sudo`.
+**Windows.** Docker Desktop with the WSL 2 backend. The installer offers it,
+accept.
+
+**macOS.** Docker Desktop. Works on Intel and Apple Silicon, and you don't need
+to know which you have.
+
+**Linux.** Docker Engine from your distro, plus your user in the `docker` group
+so you don't need `sudo`.
 
 Check:
 
@@ -22,10 +24,10 @@ docker run --rm hello-world
 
 ## 2. Give Docker memory
 
-Docker Desktop → Settings → Resources → at least 6 GB of RAM, more if you have
+Docker Desktop, then Settings, Resources, at least 6 GB of RAM. More if you have
 it. Below that Gazebo fails in confusing ways and you'll lose an evening to it.
 
-Linux users skip this; Docker uses host memory directly.
+Linux users skip this. Docker uses host memory directly.
 
 ## 3. Pull the image
 
@@ -33,7 +35,7 @@ Linux users skip this; Docker uses host memory directly.
 docker pull ghcr.io/osama-bin-lagging/auv-recruitment:2026
 ```
 
-About 4 GB. ROS 2 Humble, Gazebo Fortress and the ROS–Gazebo bridge, built for
+About 4 GB. ROS 2 Humble, Gazebo Fortress and the ROS/Gazebo bridge, built for
 both Intel and Apple Silicon. Docker picks the right one.
 
 ## 4. Fork the repo
@@ -50,7 +52,7 @@ history there is how we see how you worked.
    ```
 
    It's about 330 MB, mostly Q3 training images. On a slow connection this takes
-   a while; it isn't stuck.
+   a while. It isn't stuck.
 
 3. Commit as you go. One giant commit at the deadline tells us nothing.
 
@@ -114,21 +116,21 @@ ign gazebo -r course.sdf      # run /start-gui.sh first, then use the browser
 
 ## When it breaks
 
-**"Cannot connect to the Docker daemon"** — Docker Desktop isn't running.
+**"Cannot connect to the Docker daemon".** Docker Desktop isn't running.
 
-**Gazebo starts then dies** — almost always memory. See step 2.
+**Gazebo starts then dies.** Almost always memory. See step 2.
 
-**Browser tab is black** — Gazebo takes 10–20 seconds to draw the first frame
+**Browser tab is black.** Gazebo takes 10 to 20 seconds to draw the first frame
 under software rendering. Wait before assuming it's broken.
 
-**Everything is slow** — develop headless (`ign gazebo -s -r`) and only open the
-browser view when you need to look at something. It's much lighter.
+**Everything is slow.** Develop headless with `ign gazebo -s -r` and only open
+the browser view when you need to look at something. It's much lighter.
 
-**`ros2 run` says "No executable found"** — you either broke an entry point in
+**`ros2 run` says "No executable found".** You either broke an entry point in
 `setup.py` or forgot `source install/setup.bash` after building.
 
-**Your edits do nothing** — Python nodes get copied at build time, not
-symlinked. Re-run `colcon build`, or build once with `--symlink-install`.
+**Your edits do nothing.** Python nodes get copied at build time, not symlinked.
+Re-run `colcon build`, or build once with `--symlink-install`.
 
 ## Learning ROS 2 and Gazebo
 

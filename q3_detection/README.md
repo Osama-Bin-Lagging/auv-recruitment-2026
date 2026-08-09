@@ -1,12 +1,12 @@
-# Q3 — Gate Detection
+# Q3: Gate Detection
 
 Optional, and scored separately from Q1 and Q2. It's here to find people for the
 vision subsystem. Skipping it costs you nothing.
 
 ## The data
 
-Real footage from our pool, of the competition gate signs — the red and blue
-symbols the vehicle reads to work out which side of a gate to pass through.
+Real footage from our pool, of the competition gate signs. Those are the red and
+blue symbols the vehicle reads to work out which side of a gate to pass through.
 
 In `release/`:
 
@@ -48,13 +48,13 @@ Ship your weights.
 
 ## Grading
 
-mAP@0.5 on a held-out test set from footage that isn't in your download.
+mAP@0.5 on a held-out test set, from footage that isn't in your download.
 
-Something to know before you start: the training data comes from two recording
+Something to know before you start. The training data comes from two recording
 sessions in two different pools, and they look nothing alike. One is shallow and
 green with the signs close and large. The other is a deep blue competition pool
-where the signs are small and distant. The median object is about 3.5× smaller in
-one than the other.
+where the signs are small and distant. The median object is about 3.5 times
+smaller in one than the other.
 
 A default fine-tune at default settings handles one of those and not the other.
 That's the actual problem. Look at your data before you trust anything your

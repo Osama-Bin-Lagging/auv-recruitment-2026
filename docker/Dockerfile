@@ -5,8 +5,8 @@
 # The two architectures are NOT built the same way, and that is the whole
 # reason this file has a branch in it:
 #
-#   amd64 — ros-humble-ros-gz-sim exists as a Debian package. Install it. ~2 min.
-#   arm64 — it does NOT exist for arm64 jammy (only the bridge/image/interfaces
+#   amd64: ros-humble-ros-gz-sim is a Debian package. Install it, ~2 min.
+#   arm64: no such package for arm64 jammy (only the bridge/image/interfaces
 #           shims are published), so ros_gz has to be compiled from source.
 #           ~15 min, and it must be built SERIALLY: ros_gz_bridge instantiates
 #           enough message-conversion templates that parallel jobs exhaust the

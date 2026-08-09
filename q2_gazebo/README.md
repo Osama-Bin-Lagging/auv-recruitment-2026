@@ -1,8 +1,9 @@
-# Q2 — Fly the Course
+# Q2: Fly the Course
 
-This one isn't about clever algorithms. It checks you can get a simulator running,
-talk to it from ROS 2, and plan a path through a map you've been given. That
-sounds easy and it's where most people lose their first week on a robotics team.
+This one isn't about clever algorithms. It checks you can get a simulator
+running, talk to it from ROS 2, and plan a path through a map you've been given.
+That sounds easy, and it's where most people lose their first week on a robotics
+team.
 
 Ask on the group if setup fights you. Nobody's being marked on Docker.
 
@@ -14,38 +15,39 @@ python3 generate_world.py --seed <your_roll_number> --out course.sdf
 
 You get two files:
 
-- `course.sdf` — a 40 × 60 × 12 m pool, 3–5 gates, and some spherical obstacles
-- `course_gates.yaml` — gate poses in the order you must pass them, plus every
+- `course.sdf`, a 40 x 60 x 12 m pool with 3 to 5 gates and some spherical
+  obstacles
+- `course_gates.yaml`, the gate poses in the order you must pass them, plus every
   obstacle's position and radius
 
 Generate as many courses as you want with different seeds. You should. Your
 solution has to work on courses you've never seen, because that's what we grade
 on.
 
-## Part A — bring it up and bridge it
+## Part A: bring it up and bridge it
 
 Start the world, then connect Gazebo to ROS 2.
 
 Gazebo speaks Gazebo Transport, ROS 2 speaks DDS. Different middlewares,
-different message types. `ros_gz_bridge` translates between them, and configuring
-it is the skill here.
+different message types. `ros_gz_bridge` translates between them, and
+configuring it is the skill here.
 
 You need these as ROS 2 topics:
 
 | what | Gazebo topic | direction |
 |---|---|---|
-| odometry | `/model/auv/odometry` | Gazebo → ROS |
-| velocity command | `/model/auv/cmd_vel` | ROS → Gazebo |
-| IMU | `/auv/imu` | Gazebo → ROS |
+| odometry | `/model/auv/odometry` | Gazebo to ROS |
+| velocity command | `/model/auv/cmd_vel` | ROS to Gazebo |
+| IMU | `/auv/imu` | Gazebo to ROS |
 
 Deliver a bridge config and a launch file that starts Gazebo and the bridge with
 one command.
 
-Expect this failure: get a message type wrong and the bridge starts fine, the
+Expect this failure. Get a message type wrong and the bridge starts fine, the
 topic shows up in `ros2 topic list`, and no data ever arrives. Nothing errors. If
 a topic exists but is silent, check the type mapping before you check your code.
 
-## Part B — plan a path and fly it
+## Part B: plan a path and fly it
 
 Drive the vehicle through every gate in order, between the posts, without hitting
 an obstacle or a post.
@@ -71,8 +73,8 @@ complete run and a short screen recording.
 Your waypoints are world frame. Miss that rotation and the vehicle curves away
 from every target, which looks like a control bug rather than a frame bug.
 
-The GUI costs you loop rate. With the browser view open we measured ~17 Hz
-against ~30 Hz headless. We grade headless. Tune against the timestamps in the
+The GUI costs you loop rate. With the browser view open we measured about 17 Hz
+against 30 Hz headless. We grade headless. Tune against the timestamps in the
 odometry messages, not against wall-clock time, or it'll behave differently when
 we run it. Develop with `ign gazebo -s -r` and open the GUI when you actually
 need to look at something.
@@ -97,7 +99,7 @@ ourselves, so we don't know how hard it is. It's a sandbox, not a challenge with
 a known answer.
 
 If underwater vision is the interesting part for you, Q3 is the real version of
-it — actual footage from our pool, and actually scored.
+it. Actual footage from our pool, and actually scored.
 
 ## Grading
 

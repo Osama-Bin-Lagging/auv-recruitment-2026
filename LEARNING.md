@@ -1,7 +1,7 @@
 # Where to learn this
 
-You're not expected to know ROS 2 or Gazebo. Both are a few days of learning, and
-this page is the short path, organised by what each question needs so you're not
+You're not expected to know ROS 2 or Gazebo. Both are a few days of learning.
+This page is the short path, organised by what each question needs so you're not
 reading tutorials you'll never use.
 
 We use **ROS 2 Humble** and **Gazebo Fortress**. Google will happily give you
@@ -12,13 +12,13 @@ and check the version selector if you land somewhere else.
 
 About an hour, inside the container, in order. Everything below assumes these.
 
-1. [Configuring your environment](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Configuring-ROS2-Environment.html)
-   — what `source install/setup.bash` does. Half of all "command not found"
+1. [Configuring your environment](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Configuring-ROS2-Environment.html).
+   What `source install/setup.bash` does. Half of all "command not found"
    problems are this one thing.
-2. [Nodes and topics](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes.html)
-   — separate processes talking over named channels.
-3. [`ros2 topic` tools](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics.html)
-   — `list`, `echo`, `hz`. These are your debugger. When something doesn't work
+2. [Nodes and topics](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes.html).
+   Separate processes talking over named channels.
+3. [The `ros2 topic` tools](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics.html):
+   `list`, `echo`, `hz`. These are your debugger. When something doesn't work
    they tell you whether data is flowing before you start reading your own code.
 
 ## Q1
@@ -34,7 +34,7 @@ About an hour, inside the container, in order. Everything below assumes these.
 
 That last one is worth ten minutes even though it looks advanced. Our sensor
 topics are best-effort with depth 1, and a mismatched QoS means you receive
-nothing at all with no error anywhere.
+nothing at all, with no error anywhere.
 
 We're deliberately not linking anything about the estimation problem itself.
 Working out what to do with a direction that carries no distance is the question.
@@ -65,16 +65,16 @@ ign gazebo -s -r world.sdf             # headless server
 ```
 
 If a topic is missing, work out which side it's missing from. `ign topic -l` and
-`ros2 topic list` disagreeing is normal and tells you exactly where the bridge is
-failing.
+`ros2 topic list` disagreeing is normal, and it tells you exactly where the
+bridge is failing.
 
 ## Q3
 
-- [Ultralytics YOLO](https://docs.ultralytics.com/) — training and export
-- [YOLO dataset format](https://docs.ultralytics.com/datasets/detect/) — what the
-  `.txt` label files mean
-- [Albumentations](https://albumentations.ai/docs/) — for augmentation beyond the
-  built-in options, which you'll probably want here
+- [Ultralytics YOLO](https://docs.ultralytics.com/) for training and export
+- [YOLO dataset format](https://docs.ultralytics.com/datasets/detect/) for what
+  the `.txt` label files mean
+- [Albumentations](https://albumentations.ai/docs/) if you want augmentation
+  beyond the built-in options, which you probably will here
 
 [Colab](https://colab.research.google.com/) has a free GPU and the dataset is
 small enough for it.
@@ -90,7 +90,7 @@ Most of the time you lose won't be algorithmic. It'll be one of these:
 | Gazebo topic exists, ROS side silent | wrong type pairing in the bridge |
 | edits have no effect | Python nodes are copied at build time. Rebuild, or use `--symlink-install` |
 | vehicle drifts off target | frame confusion. `cmd_vel` is body frame, waypoints are world frame |
-| Gazebo dies on startup | memory. Docker Desktop → Resources → 6 GB+ |
+| Gazebo dies on startup | memory. Docker Desktop, Resources, 6 GB or more |
 
 The method that works: find where the data stops before you read any code.
 `ros2 topic hz` at each stage finds the break faster than staring at a callback.
