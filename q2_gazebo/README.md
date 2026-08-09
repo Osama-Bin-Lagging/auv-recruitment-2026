@@ -10,8 +10,11 @@ Ask on the group if setup fights you. Nobody's being marked on Docker.
 ## Your course
 
 ```bash
-python3 generate_world.py --seed <your_roll_number> --out course.sdf
+python3 generate_world.py --out course.sdf
 ```
+
+Every call builds a different course. The seed is printed, so you can repeat one
+with `--seed <that number>` while you're debugging.
 
 You get two files:
 
@@ -20,9 +23,9 @@ You get two files:
 - `course_gates.yaml`, the gate poses in the order you must pass them, plus every
   obstacle's position and radius
 
-Generate as many courses as you want with different seeds. You should. Your
-solution has to work on courses you've never seen, because that's what we grade
-on.
+Generate a lot of them. Your solution has to work on courses you've never seen,
+because that's what we grade on, and a planner that clears one course tells you
+very little.
 
 ## Part A: bring it up and bridge it
 
@@ -87,7 +90,7 @@ work.
 The vehicle can carry a forward camera:
 
 ```bash
-python3 generate_world.py --seed <your_roll_number> --with-camera --out course.sdf
+python3 generate_world.py --with-camera --out course.sdf
 ```
 
 That adds `/auv/camera`. The posts are red and blue against blue-green water, so

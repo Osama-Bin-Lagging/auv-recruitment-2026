@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 # Checks that we can actually run your submission. Not a score.
-#   ./validate.sh <your_roll_number>
+#   ./validate.sh [seed]
 # Run it inside the provided image. If anything fails we cannot grade you.
 
 # No -u: ROS's setup.bash reads unset vars, which would abort the script.
 set -o pipefail
 
-SEED="${1:-0}"
+SEED="${1:--1}"
 WS="$(cd "$(dirname "$0")" && pwd)/ros2_ws"
 PASS=0
 FAIL=0
@@ -14,7 +14,7 @@ FAIL=0
 ok()   { echo "  OK    $1"; PASS=$((PASS+1)); }
 bad()  { echo "  FAIL  $1"; FAIL=$((FAIL+1)); }
 
-echo "validating submission (seed $SEED)"
+echo "validating submission"
 echo
 
 # --- 1. structure --------------------------------------------------------

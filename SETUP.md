@@ -100,7 +100,7 @@ cd /work/q1_pinger/ros2_ws
 source /opt/ros/humble/setup.bash
 colcon build --merge-install
 source install/setup.bash
-ros2 launch auv_sim pinger.launch.py seed:=<your_roll_number>
+ros2 launch auv_sim pinger.launch.py
 ```
 
 You should see `sim ready` and `controller up`, then the vehicle chasing the
@@ -110,7 +110,7 @@ For Q2:
 
 ```bash
 cd /work/q2_gazebo
-python3 generate_world.py --seed <your_roll_number> --out course.sdf
+python3 generate_world.py --out course.sdf
 ign gazebo -r course.sdf      # run /start-gui.sh first, then use the browser
 ```
 

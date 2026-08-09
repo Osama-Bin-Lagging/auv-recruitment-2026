@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import random
 import threading
 
 import rclpy
@@ -8,7 +9,7 @@ from rclpy.node import Node
 from rclpy.qos import QoSHistoryPolicy, QoSProfile, QoSReliabilityPolicy
 
 from auv_interfaces.msg import EpisodeStatus, HydrophoneFix, VehicleState, VelocityCommand
-from auv_sim.pinger_sim import CAPTURE_RADIUS, DT, HOLD_REQUIRED, PingerSim
+from auv_sim.pinger_sim import CAPTURE_RADIUS, DEV_SEED_MAX, DT, HOLD_REQUIRED, PingerSim
 
 # Depth 1 best-effort: a stale bearing is worse than no bearing.
 SENSOR_QOS = QoSProfile(
@@ -27,12 +28,17 @@ class SimNode(Node):
     def __init__(self):
         super().__init__("auv_sim")
 
-        self.declare_parameter("seed", 0)
+        self.declare_parameter("seed", -1)
         self.declare_parameter("mode", "realtime")
         self.declare_parameter("command_timeout", 0.5)
         self.declare_parameter("trace_file", "")
 
         self.seed = int(self.get_parameter("seed").value)
+        if self.seed < 0:
+            # Random arena every run, so a controller tuned to one scenario
+            # fails here rather than at grading. DEV_SEED_MAX keeps candidate
+            # draws disjoint from the grading range.
+            self.seed = random.randrange(1, DEV_SEED_MAX)
         self.mode = str(self.get_parameter("mode").value)
         self.command_timeout = float(self.get_parameter("command_timeout").value)
 
@@ -55,7 +61,8 @@ class SimNode(Node):
             self._trace.write("t,x,y,heading,valid,bearing,hold_time\n")
 
         self.get_logger().info(
-            f"sim ready: seed={self.seed} mode={self.mode} "
+            f"sim ready: seed={self.seed}  (re-run this arena with seed:={self.seed}) "
+            f"mode={self.mode} "
             f"capture={CAPTURE_RADIUS}m hold={HOLD_REQUIRED}s"
         )
 

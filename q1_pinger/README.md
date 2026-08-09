@@ -13,8 +13,11 @@ before you write anything.
 cd ros2_ws
 colcon build --merge-install
 source install/setup.bash
-ros2 launch auv_sim pinger.launch.py seed:=<your_roll_number>
+ros2 launch auv_sim pinger.launch.py
 ```
+
+Every run gives you a different arena. The seed is printed at startup, so if
+something interesting happens you can repeat it with `seed:=<that number>`.
 
 ## Seeing what happened
 
@@ -67,11 +70,21 @@ Get within 1.0 m of the pinger and stay there for 5 continuous seconds.
 Leaving the radius resets the timer. Orbiting isn't holding. You have 200
 seconds.
 
-## Your seed
+## Seeds
 
-Your arena comes from your roll number. Pinger position, noise, dropout rate and
-the quiet window all differ between candidates, so gains that work for someone
-else won't work for you. Grading uses seeds nobody has run.
+By default every run draws a new arena: different pinger position, different
+noise level, different dropout rate, different quiet window. That's deliberate.
+A controller tuned to one scenario should fail here, in front of you, rather than
+at grading where you can't see it.
+
+Pin a seed when you're debugging something specific:
+
+```bash
+ros2 launch auv_sim pinger.launch.py seed:=1234
+```
+
+Grading uses its own seeds, from a range you can't draw. Getting it working on
+one arena means nothing. Run it twenty times.
 
 ## Timing modes
 
@@ -95,7 +108,7 @@ Your `controller_node`, plus:
 - `REPORT.md`, one page: your approach, and a paragraph on something that didn't
   work and how you figured out why
 
-Run `./validate.sh <your_roll_number>` first. It won't tell you your score, only
+Run `./validate.sh` first. It won't tell you your score, only
 whether we can run your code at all.
 
 ## Grading

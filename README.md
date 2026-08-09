@@ -29,19 +29,19 @@ understood than a success you can't explain.
 Use it. Everyone will, and pretending otherwise just rewards whoever hides it
 best.
 
-It won't get you far here, for structural reasons rather than moral ones. Every
-question is randomised from your roll number, so no two people have the same
-problem, and grading uses seeds and data nobody has seen. A model can write you a
-controller. It can't tell you why yours overshoots on your pinger, because it has
-never run your simulator.
+It won't get you far here, for structural reasons rather than moral ones. Both
+simulators draw a fresh random scenario on every run, and grading uses seeds and
+data nobody has seen. A model can write you a controller. It can't tell you why
+yours overshoots on the arena you just watched, because it has never run your
+simulator.
 
 The interview at the end is a conversation about your code. Turn up understanding
 it.
 
 ## Rules
 
-Work alone. Talking about ideas is fine, sharing code isn't. Everyone has a
-different seed, so shared constants won't work anyway.
+Work alone. Talking about ideas is fine, sharing code isn't. Nobody has a fixed
+scenario to share constants for anyway.
 
 Don't modify `auv_interfaces`. Our grading simulator is built against those exact
 message definitions, so changing them means your controller can't talk to it.

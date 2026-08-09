@@ -14,6 +14,10 @@ PING_INTERVAL = 2.0
 DT = 1.0 / 60.0
 TIMEOUT = 200.0
 
+# Random development seeds come from below this; grading seeds sit above it,
+# so a candidate can never stumble onto one.
+DEV_SEED_MAX = 1_000_000
+
 
 def wrap_pi(a: float) -> float:
     return (a + math.pi) % (2.0 * math.pi) - math.pi

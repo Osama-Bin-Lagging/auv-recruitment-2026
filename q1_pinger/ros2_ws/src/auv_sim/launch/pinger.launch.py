@@ -1,4 +1,5 @@
-# ros2 launch auv_sim pinger.launch.py seed:=<roll_number>
+# ros2 launch auv_sim pinger.launch.py
+#   seed:=1234            repeat one arena instead of a random one
 #   mode:=lockstep        run the way grading does
 #   trace_file:=run.csv   record a run for plot_run.py
 
@@ -14,8 +15,8 @@ def generate_launch_description():
     trace = LaunchConfiguration("trace_file")
 
     return LaunchDescription([
-        DeclareLaunchArgument("seed", default_value="0",
-                              description="your roll number"),
+        DeclareLaunchArgument("seed", default_value="-1",
+                              description="omit for a random arena"),
         DeclareLaunchArgument("mode", default_value="realtime",
                               description="realtime | lockstep"),
         DeclareLaunchArgument("trace_file", default_value="",

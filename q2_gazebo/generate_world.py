@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-# Generates a seeded Gazebo Fortress course as one self-contained .sdf.
-#   python3 generate_world.py --seed 42 --out course_42.sdf
-#   python3 generate_world.py --seed 42 --answer     # gate ground truth
+# Generates a Gazebo Fortress course as one self-contained .sdf.
+#   python3 generate_world.py --out course.sdf            random course
+#   python3 generate_world.py --seed 42 --out c.sdf       repeat one course
+#   python3 generate_world.py --seed 42 --answer          gate ground truth
 
 from __future__ import annotations
 
 import argparse
 import math
 import random
+
+DEV_SEED_MAX = 1_000_000   # grading seeds sit above this
 
 CAMERA_SDF = """        <sensor name="front_camera" type="camera">
           <pose>0.45 0 0 0 0 0</pose>
@@ -238,13 +241,17 @@ def build_world(seed: int, with_camera: bool = False) -> str:
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--seed", type=int, required=True)
+    ap.add_argument("--seed", type=int, default=None,
+                    help="omit for a random course")
     ap.add_argument("--out", default=None)
     ap.add_argument("--with-camera", action="store_true",
                     help="add the forward camera (only needed for the optional part)")
     ap.add_argument("--answer", action="store_true",
                     help="print gate ground truth (grader use only)")
     args = ap.parse_args()
+    if args.seed is None:
+        args.seed = random.randrange(1, DEV_SEED_MAX)
+        print(f"seed {args.seed}  (repeat this course with --seed {args.seed})")
 
     if args.answer:
         gates, obstacles, start = build_course(args.seed)
