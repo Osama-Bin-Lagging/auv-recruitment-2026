@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import random
 import threading
+import time
 
 import rclpy
 import rclpy.executors
@@ -118,13 +119,18 @@ class SimNode(Node):
     def _await_command(self, step: int):
         if self.mode != "lockstep":
             return self._cmd
-        self._cmd_event.clear()
-        while self._cmd_event.wait(self.command_timeout):
-            self._cmd_event.clear()
+        # Check before clearing: the command for this step can arrive while
+        # _publish() is still running, and clearing first would discard it.
+        # One absolute deadline, so a mismatched wake-up cannot extend the wait.
+        deadline = time.monotonic() + self.command_timeout
+        while True:
             if self._cmd_step == step:
                 return self._cmd
-        self.missed_deadlines += 1
-        return (0.0, 0.0, 0.0)
+            remaining = deadline - time.monotonic()
+            if remaining <= 0 or not self._cmd_event.wait(remaining):
+                self.missed_deadlines += 1
+                return (0.0, 0.0, 0.0)
+            self._cmd_event.clear()
 
     def run(self):
         next_wall = self.get_clock().now().nanoseconds / 1e9

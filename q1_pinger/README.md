@@ -21,18 +21,26 @@ something interesting happens you can repeat it with `seed:=<that number>`.
 
 ## Seeing what happened
 
-There's no live view, but you can record a run and plot it:
+There's no live view. Record a run and look at it yourself:
 
 ```bash
-ros2 launch auv_sim pinger.launch.py seed:=1234 trace_file:=run.csv
-python3 plot_run.py run.csv
+ros2 launch auv_sim pinger.launch.py trace_file:=run.csv
 ```
 
-You get your path, the points where a bearing fix arrived, and your distance to
-the pinger over time. The pinger's real position goes into the trace only after
-the episode ends, so it can't help you mid-run.
+That writes a CSV, one row per step:
 
-Do this with the starter controller first.
+```
+t,x,y,heading,valid,bearing,hold_time
+```
+
+and, once the episode is over, two trailing comment lines giving the pinger's
+true position and the capture radius. They're written at the end on purpose, so
+the file can't help you mid-run.
+
+Plotting it is up to you. Your path against the pinger, and your distance to it
+over time, are the two that tend to make the problem obvious.
+
+Do this with the starter controller before you write anything.
 
 ## What you get
 

@@ -1,7 +1,7 @@
 # ros2 launch auv_sim pinger.launch.py
 #   seed:=1234            repeat one arena instead of a random one
 #   mode:=lockstep        run the way grading does
-#   trace_file:=run.csv   record a run for plot_run.py
+#   trace_file:=run.csv   record a CSV trace of the run
 
 from launch import LaunchDescription
 from launch.actions import DeclareLaunchArgument
@@ -20,7 +20,7 @@ def generate_launch_description():
         DeclareLaunchArgument("mode", default_value="realtime",
                               description="realtime | lockstep"),
         DeclareLaunchArgument("trace_file", default_value="",
-                              description="CSV to record, for plot_run.py"),
+                              description="CSV trace of the run"),
         Node(
             package="auv_sim", executable="sim_node", name="auv_sim",
             output="screen",

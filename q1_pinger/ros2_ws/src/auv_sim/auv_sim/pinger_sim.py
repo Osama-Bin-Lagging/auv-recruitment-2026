@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+import hashlib
 import math
+import os
 from dataclasses import dataclass
 
 import numpy as np
@@ -17,6 +19,16 @@ TIMEOUT = 200.0
 # Random development seeds come from below this; grading seeds sit above it,
 # so a candidate can never stumble onto one.
 DEV_SEED_MAX = 1_000_000
+
+
+def _arena_key(seed: int) -> int:
+    # The seed is visible to anything on the ROS graph, and this file ships, so
+    # seed -> arena must not be computable by a candidate. Grading sets a salt
+    # that is never published; without it the seed identifies an arena but does
+    # not reveal one.
+    salt = os.environ.get("AUV_ARENA_SALT", "")
+    return int.from_bytes(
+        hashlib.sha256(f"{seed}:{salt}".encode()).digest()[:8], "big")
 
 
 def wrap_pi(a: float) -> float:
@@ -51,7 +63,8 @@ class Result:
 class PingerSim:
     def __init__(self, seed: int):
         self.seed = seed
-        rng = np.random.default_rng(seed)
+        key = _arena_key(seed)
+        rng = np.random.default_rng(key)
 
         r = rng.uniform(25.0, 70.0)
         th = rng.uniform(-math.pi, math.pi)
@@ -66,7 +79,7 @@ class PingerSim:
         self.vel = np.zeros(2)
         self.heading = rng.uniform(-math.pi, math.pi)
 
-        self._rng = np.random.default_rng(seed ^ 0xA5A5)
+        self._rng = np.random.default_rng(key ^ 0xA5A5)
         self.t = 0.0
         self.step_i = 0
         self._next_ping = 0.0

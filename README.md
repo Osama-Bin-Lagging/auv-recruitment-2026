@@ -45,9 +45,10 @@ scenario to share constants for anyway.
 
 Don't modify `auv_interfaces`. Our grading simulator is built against those exact
 message definitions, so changing them means your controller can't talk to it.
-`validate.sh` checks.
+`q1_pinger/validate.sh` hashes them and will tell you if you have.
 
-Submit one repo, one branch. Run `validate.sh` before you do.
+Submit one repo, one branch. Run `q1_pinger/validate.sh` before you do; it
+checks that Q1 builds and runs, which is the part we can't grade if it's broken.
 
 ## Stuck?
 
