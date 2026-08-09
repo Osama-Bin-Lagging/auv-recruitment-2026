@@ -113,11 +113,12 @@ Your `controller_node`, plus:
 
 - tuning as ROS parameters, not constants in the source
 - a launch file that brings up sim and controller together
-- `REPORT.md`, one page: your approach, and a paragraph on something that didn't
-  work and how you figured out why
 
-Run `./validate.sh` first. It won't tell you your score, only
-whether we can run your code at all.
+Run `./validate.sh` first. It won't tell you your score, only whether we can run
+your code at all.
+
+Write up this question in `REPORT.md` at the root of your fork. See the
+[submission instructions](../README.md#the-report).
 
 ## Grading
 

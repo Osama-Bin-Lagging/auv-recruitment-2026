@@ -62,5 +62,7 @@ training script prints.
 
 ## Submitting
 
-`infer.py`, your weights, a pinned `requirements.txt`, and half a page on your
-augmentation strategy and why you chose it.
+`infer.py`, your weights, and a pinned `requirements.txt`.
+
+Write up this question in `REPORT.md` at the root of your fork. See the
+[submission instructions](../README.md#the-report).

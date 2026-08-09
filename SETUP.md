@@ -40,8 +40,7 @@ both Intel and Apple Silicon. Docker picks the right one.
 
 ## 4. Fork the repo
 
-Fork it, don't just clone it. Your fork is what you submit, and the commit
-history there is how we see how you worked.
+Fork it, don't just clone it. Your fork is what you submit.
 
 1. Click **Fork** on GitHub.
 2. Clone your fork:
@@ -54,10 +53,8 @@ history there is how we see how you worked.
    It's about 330 MB, mostly Q3 training images. On a slow connection this takes
    a while. It isn't stuck.
 
-3. Commit as you go. One giant commit at the deadline tells us nothing.
-
-Keep your fork public so we can read it, or add us as collaborators if you'd
-rather it stayed private.
+The rest of the submission process, including how you actually hand it in, is in
+the [README](README.md#how-to-submit).
 
 If we push a fix during the week:
 

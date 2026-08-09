@@ -19,7 +19,8 @@ with `--seed <that number>` while you're debugging.
 You get two files:
 
 - `course.sdf`, a 40 x 60 x 12 m pool with 3 to 5 gates and some spherical
-  obstacles
+  obstacles. Everything sits inside those bounds, so you can clamp your planner
+  to them
 - `course_gates.yaml`, the gate poses in the order you must pass them, plus every
   obstacle's position and radius
 
@@ -61,9 +62,12 @@ awkward:
 - Obstacles sit between the gates. Drive straight at each gate in turn and you'll
   hit something. We checked.
 - Gates are 2.0 m wide and the vehicle is 0.9 m long, so arriving at an angle
-  clips a post. How you approach matters as much as getting there.
+  clips a post. How you approach matters as much as getting there. Each gate
+  faces roughly along the leg you arrive on, within about 30 degrees, so a
+  standoff waypoint on the gate normal is always enough.
 
-A gate at `(x, y, z, yaw)` faces along `(cos yaw, sin yaw)`. Your vehicle's
+A gate at `(x, y, z, yaw)` has its two posts separated along `(cos yaw, sin yaw)`,
+so you fly through it along the perpendicular, `(-sin yaw, cos yaw)`. Your vehicle's
 half-diagonal is about 0.5 m, so stay at least `radius + 0.5` m from any obstacle
 centre.
 
@@ -114,6 +118,8 @@ vehicle never moves, and there's nothing else to measure.
 
 ## Submitting
 
-A ROS 2 package with your bridge config, launch file and navigation node, the
-rosbag, the screen recording, and half a page on whatever took you longest to
-debug.
+Your bridge config, launch file and navigation node, plus a rosbag of one
+complete run and a screen recording of the same run.
+
+Write up this question in `REPORT.md` at the root of your fork. See the
+[submission instructions](../README.md#the-report).
