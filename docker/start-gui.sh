@@ -23,7 +23,11 @@ echo "  (no password; click Connect)"
 echo "=================================================="
 
 source /opt/ros/humble/setup.bash
-source /ws/install/setup.bash
+# Only the arm64 build has a /ws overlay; amd64 installs ros_gz from apt.
+# An unguarded source here kills the script under `set -e`.
+if [ -f /ws/install/setup.bash ]; then
+  source /ws/install/setup.bash
+fi
 
 if [ -n "$1" ]; then
   echo "launching world: $1"
