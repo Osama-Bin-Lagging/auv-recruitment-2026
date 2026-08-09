@@ -7,8 +7,8 @@ grader/
 q3_detection/private/
 
 # ---- generated per-seed worlds ----
-q2_gazebo/course_*.sdf
-q2_gazebo/course_*_gates.yaml
+q2_gazebo/*.sdf
+q2_gazebo/*_gates.yaml
 
 # ---- build artifacts ----
 **/build/
