@@ -1,7 +1,7 @@
 # Setup
 
-Read this first. Setup isn't part of what we're testing, so if it fights you, ask
-on the group and we'll sort it out. Nobody's being marked on installing Docker.
+Read this first. Setup isn't part of what we're testing, so if it fights you,
+ask and we'll sort it out. Nobody's being marked on installing Docker.
 
 Budget about 45 minutes, mostly downloading.
 

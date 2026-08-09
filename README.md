@@ -62,7 +62,7 @@ you like as long as `REPORT.md` says where they are and your launch file works.
    private, add us as collaborators. We can't grade a fork we can't open.
 4. **Run `q1_pinger/validate.sh`** and fix anything it flags. It checks that your
    Q1 code builds and runs, which is the part we can't grade if it's broken.
-5. **Submit your fork's URL** through the submission form: `<SUBMISSION_LINK>`
+5. **Submit your fork's URL** through the submission form.
 
 Pushing to your fork does not submit anything. We collect URLs through the form,
 so if you don't fill it in, you haven't applied.
@@ -129,6 +129,6 @@ short interview.
 
 ## Stuck?
 
-Ask on the group. Setup problems especially aren't part of what we're measuring,
+Ask. Setup problems especially aren't part of what we're measuring,
 and we'd rather spend five minutes unblocking you than have you lose a day to a
 Docker flag. Post the exact command and the exact error.

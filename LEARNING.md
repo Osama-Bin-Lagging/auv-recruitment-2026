@@ -70,14 +70,13 @@ bridge is failing.
 
 ## Q3
 
-- [Ultralytics YOLO](https://docs.ultralytics.com/) for training and export
-- [YOLO dataset format](https://docs.ultralytics.com/datasets/detect/) for what
-  the `.txt` label files mean
-- [Albumentations](https://albumentations.ai/docs/) if you want augmentation
-  beyond the built-in options, which you probably will here
+No reading list here on purpose. Which detector you train, what you train it
+with, and how you augment are all yours to decide, and picking those is part of
+what we want to see.
 
-[Colab](https://colab.research.google.com/) has a free GPU and the dataset is
-small enough for it.
+The only fixed things are the label format, the output contract and the latency
+budget, all in the [question](q3_detection/). The dataset is small enough to
+train on a free cloud GPU.
 
 ## Debugging
 
@@ -97,5 +96,4 @@ The method that works: find where the data stops before you read any code.
 
 ## Asking for help
 
-Ask on the group. Post the exact command and the exact error, not "it doesn't
-work".
+Ask. Post the exact command and the exact error, not "it doesn't work".

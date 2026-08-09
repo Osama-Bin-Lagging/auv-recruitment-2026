@@ -5,7 +5,7 @@ running, talk to it from ROS 2, and plan a path through a map you've been given.
 That sounds easy, and it's where most people lose their first week on a robotics
 team.
 
-Ask on the group if setup fights you. Nobody's being marked on Docker.
+Ask if setup fights you. Nobody's being marked on Docker.
 
 ## Your course
 

@@ -18,7 +18,9 @@ In `release/`:
 The two splits share no frames. Several augmented copies of each frame exist, and
 they are kept together, so validation mAP means something.
 
-Two classes, `blue_side` and `red_side`. Labels are YOLO format.
+Two classes, `blue_side` and `red_side`. One `.txt` per image, one line per
+object: class index, then box centre x, centre y, width and height, all
+normalised to 0-1.
 
 ## The task
 
