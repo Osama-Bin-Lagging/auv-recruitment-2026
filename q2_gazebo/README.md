@@ -63,8 +63,11 @@ awkward:
   hit something. We checked.
 - Gates are 2.0 m wide and the vehicle is 0.9 m long, so arriving at an angle
   clips a post. How you approach matters as much as getting there. Each gate
-  faces roughly along the leg you arrive on, within about 30 degrees, so a
-  standoff waypoint on the gate normal is always enough.
+  faces roughly along the leg you arrive on, within about 30 degrees, so lining
+  up on the gate normal before you go through is a workable approach. Pick where
+  you line up from by checking the map, though: obstacles are only guaranteed
+  clear of the gate itself, not of a point an arbitrary distance out along the
+  normal.
 
 A gate at `(x, y, z, yaw)` has its two posts separated along `(cos yaw, sin yaw)`,
 so you fly through it along the perpendicular, `(-sin yaw, cos yaw)`. Your vehicle's

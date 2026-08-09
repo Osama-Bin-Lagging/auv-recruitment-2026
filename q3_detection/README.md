@@ -12,8 +12,11 @@ In `release/`:
 
 | split | images |
 |---|---|
-| train | 2,329 |
-| valid | 292 |
+| train | 2,317 |
+| valid | 304 |
+
+The two splits share no frames. Several augmented copies of each frame exist, and
+they are kept together, so validation mAP means something.
 
 Two classes, `blue_side` and `red_side`. Labels are YOLO format.
 
@@ -50,11 +53,13 @@ Ship your weights.
 
 mAP@0.5 on a held-out test set, from footage that isn't in your download.
 
-Something to know before you start. The training data comes from two recording
-sessions in two different pools, and they look nothing alike. One is shallow and
-green with the signs close and large. The other is a deep blue competition pool
-where the signs are small and distant. The median object is about 3.5 times
-smaller in one than the other.
+Something to know before you start. The training data comes from three recording
+sessions in two different pools, and they look nothing alike. Two are in a
+shallow green pool with the signs close and large. The third is a deep blue
+competition pool where the signs are small and distant. Between the two pools the
+median object differs by about 4x in area, so roughly 2x in width and height, and
+the two sessions in the green pool differ from each other by about 2x in area on
+top of that.
 
 A default fine-tune at default settings handles one of those and not the other.
 That's the actual problem. Look at your data before you trust anything your
