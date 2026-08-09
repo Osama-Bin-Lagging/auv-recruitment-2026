@@ -9,8 +9,10 @@ from __future__ import annotations
 import argparse
 import math
 import random
+import sys
 
 DEV_SEED_MAX = 1_000_000   # grading seeds sit above this
+MIN_LEG = 9.5              # shorter legs leave no room for an obstacle
 
 CAMERA_SDF = """        <sensor name="front_camera" type="camera">
           <pose>0.45 0 0 0 0 0</pose>
@@ -142,19 +144,35 @@ def vehicle_sdf(start_x: float, start_y: float, start_z: float, start_yaw: float
 
 def build_course(seed: int):
     rng = random.Random(seed)
-    n_gates = rng.choice([3, 4, 4, 5])
 
     start_xy = (rng.uniform(-2, 2), -POOL_L / 2 + 3.0)
+    y_cap = POOL_L / 2 - 6.0
+    span = y_cap - start_xy[1]
+
+    # Spacing derives from the run available rather than accumulating blind, so
+    # the course cannot walk out of the pool. start -> gate 0 counts as a leg;
+    # when it did not, that leg was ~7 m and its obstacle rarely fitted.
+    n_gates = rng.choice([3, 4, 4, 5])
+    while n_gates > 1 and span / n_gates < MIN_LEG:
+        n_gates -= 1
+    leg_max = min(14.0, span / n_gates)
 
     gates = []
-    y = -POOL_L / 2 + 10.0
-    for i in range(n_gates):
+    prev = start_xy
+    y = start_xy[1]
+    for _ in range(n_gates):
+        y += rng.uniform(MIN_LEG, leg_max)
         x = rng.uniform(-POOL_W / 4, POOL_W / 4)
         # Near the start depth: this question is not 3D trajectory planning.
         z = rng.uniform(-5.0, -3.5)
-        yaw = rng.uniform(-0.5, 0.5)
+        # A gate's opening runs along its local +y, i.e. yaw + pi/2. Aim that at
+        # the leg the vehicle arrives on, so the effective aperture cannot
+        # collapse to nothing on a straight-line approach.
+        leg = math.atan2(y - prev[1], x - prev[0])
+        yaw = leg - math.pi / 2 + rng.uniform(-0.5, 0.5)
+        yaw = (yaw + math.pi) % (2 * math.pi) - math.pi
         gates.append((x, y, z, yaw))
-        y += rng.uniform(9.0, 14.0)
+        prev = (x, y)
 
     # On the line between consecutive gates, so every seed blocks a naive
     # straight-line follower rather than only some seeds doing so.
@@ -162,22 +180,29 @@ def build_course(seed: int):
     legs = [(start_xy, gates[0][:2])] if gates else []
     legs += [(gates[i][:2], gates[i + 1][:2]) for i in range(len(gates) - 1)]
     for i, (a, b) in enumerate(legs):
-        t = rng.uniform(0.35, 0.65)                 # partway along the leg
-        cx = a[0] + (b[0] - a[0]) * t
-        cy = a[1] + (b[1] - a[1]) * t
         dx, dy = b[0] - a[0], b[1] - a[1]
         n = math.hypot(dx, dy) or 1.0
         px, py = -dy / n, dx / n
-        # Keep clear of the gates themselves; a blocked gate is unfair.
+        placed = False
+        # Vary the point along the leg too, not just the offset: with it fixed,
+        # a base point near a gate made all 24 attempts fail and the obstacle
+        # was dropped silently.
         for _attempt in range(24):
+            t = rng.uniform(0.35, 0.65)
             off = rng.uniform(-1.2, 1.2)
             r = rng.uniform(0.6, 1.1)
-            ox, oy = cx + px * off, cy + py * off
+            lim = POOL_W / 2 - 2.0
+            ox = min(max(a[0] + dx * t + px * off, -lim), lim)
+            oy = min(max(a[1] + dy * t + py * off, start_xy[1]), y_cap)
             oz = rng.uniform(-5.0, -3.5)
+            # Keep clear of the gates themselves; a blocked gate is unfair.
             if all(math.hypot(ox - g[0], oy - g[1]) > (GATE_WIDTH + r + 1.0)
                    for g in gates):
                 obstacles.append((ox, oy, oz, r))
+                placed = True
                 break
+        if not placed:
+            print(f"warning: seed {seed} leg {i} has no obstacle", file=sys.stderr)
 
     start = (start_xy[0], start_xy[1], -4.0, rng.uniform(-0.3, 0.3))
     return gates, obstacles, start
